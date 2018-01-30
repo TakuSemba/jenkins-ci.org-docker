@@ -3,6 +3,24 @@ FROM ubuntu:14.04
 RUN apt-get update && apt-get install -y wget git curl
 RUN apt-get update && apt-get install -y --no-install-recommends openjdk-7-jdk
 RUN apt-get update && apt-get install -y maven ant ruby rbenv make
+
+# JDKインストール
+# 2回実行しているのは Connection timed out が起きがちだったため。
+RUN apt-get -y update
+RUN apt-get -y install openjdk-8-jdk || true
+RUN apt-get -y install openjdk-8-jdk
+
+# Android SDKインストール
+RUN apt-get install -y wget unzip
+RUN wget https://dl.google.com/android/repository/tools_r25.2.3-linux.zip
+RUN mkdir -p /Android/sdk
+RUN unzip tools_r25.2.3-linux.zip -d /Android/sdk
+
+# 環境変数
+ENV JAVA_HOME /usr/lib/jvm/java-8-openjdk-amd64
+ENV ANDROID_HOME /Android/sdk
+ENV PATH $ANDROID_HOME/bin:$PATH
+
 RUN echo "1.554.3" > .lts-version-number
 RUN wget -q -O - http://pkg.jenkins-ci.org/debian-stable/jenkins-ci.org.key | sudo apt-key add -
 RUN echo deb http://pkg.jenkins-ci.org/debian-stable binary/ >> /etc/apt/sources.list
